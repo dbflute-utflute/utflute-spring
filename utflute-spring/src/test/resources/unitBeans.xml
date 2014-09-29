@@ -13,15 +13,15 @@
 	<!-- for field injection -->
 	<context:annotation-config/>
 
-    <bean id="fooController" class="org.seasar.dbflute.unit.spring.bean.FooControllerImpl" autowire="byType">
+    <bean id="fooController" class="org.dbflute.utflute.spring.bean.FooControllerImpl" autowire="byType">
     </bean>
-    <bean id="fooFacade" class="org.seasar.dbflute.unit.spring.bean.FooFacade" autowire="byType">
+    <bean id="fooFacade" class="org.dbflute.utflute.spring.bean.FooFacade" autowire="byType">
     </bean>
-    <bean id="fooLogic" class="org.seasar.dbflute.unit.spring.bean.FooLogic" autowire="byType">
+    <bean id="fooLogic" class="org.dbflute.utflute.spring.bean.FooLogic" autowire="byType">
     </bean>
-    <bean id="fooService" class="org.seasar.dbflute.unit.spring.bean.FooService" autowire="byType">
+    <bean id="fooService" class="org.dbflute.utflute.spring.bean.FooService" autowire="byType">
     </bean>
 
-    <bean id="fooBhv" class="org.seasar.dbflute.unit.spring.dbflute.exbhv.FooBhv" autowire="byType">
+    <bean id="fooBhv" class="org.dbflute.utflute.spring.dbflute.exbhv.FooBhv" autowire="byType">
     </bean>
 </beans>

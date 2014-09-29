@@ -4,8 +4,8 @@
     "http://www.springframework.org/dtd/spring-beans.dtd"
 >
 <beans>
-    <bean id="barLogic" class="org.seasar.dbflute.unit.spring.web.bean.BarLogic" autowire="byType">
+    <bean id="barLogic" class="org.dbflute.utflute.spring.web.bean.BarLogic" autowire="byType">
     </bean>
-    <bean id="barBhv" class="org.seasar.dbflute.unit.spring.web.dbflute.exbhv.BarBhv" autowire="byType">
+    <bean id="barBhv" class="org.dbflute.utflute.spring.web.dbflute.exbhv.BarBhv" autowire="byType">
     </bean>
 </beans>

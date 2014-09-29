@@ -19,8 +19,8 @@
     </bean>
 
     <!-- The example original component for building connection string of H2. -->
-    <bean name="exampleDbUrl" class="org.seasar.dbflute.unit.spring.web.EmbeddedH2UrlFactoryBean">
+    <bean name="exampleDbUrl" class="org.dbflute.utflute.spring.web.EmbeddedH2UrlFactoryBean">
     	<property name="urlSuffix" value="/exampledb/exampledb" />
-    	<property name="referenceClassName" value="org.seasar.dbflute.unit.spring.web.EmbeddedH2UrlFactoryBean" />
+    	<property name="referenceClassName" value="org.dbflute.utflute.spring.web.EmbeddedH2UrlFactoryBean" />
     </bean>
 </beans>
