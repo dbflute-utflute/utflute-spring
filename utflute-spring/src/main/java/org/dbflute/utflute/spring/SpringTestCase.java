@@ -18,6 +18,7 @@ package org.dbflute.utflute.spring;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Resource;
@@ -138,18 +139,41 @@ public abstract class SpringTestCase extends InjectionTestCase {
      */
     @Override
     protected TransactionResource beginNewTransaction() { // user method
-        final String managerKey = "transactionManager";
-        if (!hasComponent(managerKey)) {
-            return null;
+        final String defaultManagerName = "transactionManager";
+        final String[] managerNames = prepareAdditionalTransactionManagerNames();
+        final List<String> managerNameList = newArrayList();
+        managerNameList.add(defaultManagerName);
+        for (String name : managerNames) {
+            managerNameList.add(name);
         }
+        SpringTransactionResource resource = null;
+        for (String name : managerNames) {
+            if (!hasComponent(name)) {
+                if (name.equals(defaultManagerName)) { // default transaction
+                    continue;
+                }
+                String msg = "Not found the transaction mamanger: " + name;
+                throw new IllegalStateException(msg);
+            }
+            if (resource == null) {
+                resource = new SpringTransactionResource();
+            }
+            xregisterTransaction(resource, name);
+        }
+        return resource; // for cannonball's transaction or manual transaction
+    }
+
+    protected String[] prepareAdditionalTransactionManagerNames() { // customize point #extPoint
+        return new String[] {}; // as default
+    }
+
+    protected SpringTransactionResource xregisterTransaction(SpringTransactionResource resource, final String managerKey) {
         final PlatformTransactionManager manager = getComponent(managerKey);
         final DefaultTransactionDefinition def = new DefaultTransactionDefinition();
         def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
         final TransactionStatus status = manager.getTransaction(def);
-        final SpringTransactionResource resource = new SpringTransactionResource();
-        resource.setTransactionManager(manager);
-        resource.setTransactionStatus(status);
-        return resource; // for thread-fire's transaction or manual transaction
+        resource.registerTransaction(manager, status);
+        return resource;
     }
 
     // ===================================================================================

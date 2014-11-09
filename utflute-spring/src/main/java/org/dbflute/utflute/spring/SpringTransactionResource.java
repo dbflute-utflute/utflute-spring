@@ -15,6 +15,9 @@
  */
 package org.dbflute.utflute.spring;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.dbflute.utflute.core.transaction.TransactionFailureException;
 import org.dbflute.utflute.core.transaction.TransactionResource;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -26,12 +29,42 @@ import org.springframework.transaction.TransactionStatus;
  */
 public class SpringTransactionResource implements TransactionResource {
 
-    protected PlatformTransactionManager _transactionManager;
-    protected TransactionStatus _transactionStatus;
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    protected final List<OneTransactionElement> _transactionManagerList = new ArrayList<OneTransactionElement>(4);
 
+    public static class OneTransactionElement {
+        protected PlatformTransactionManager _platformTransactionManager;
+        protected TransactionStatus _transactionStatus;
+
+        public PlatformTransactionManager getTransactionManager() {
+            return _platformTransactionManager;
+        }
+
+        public void setTransactionManager(PlatformTransactionManager transactionManager) {
+            _platformTransactionManager = transactionManager;
+        }
+
+        public TransactionStatus getTransactionStatus() {
+            return _transactionStatus;
+        }
+
+        public void setTransactionStatus(TransactionStatus transactionStatus) {
+            _transactionStatus = transactionStatus;
+        }
+    }
+
+    // ===================================================================================
+    //                                                                 Transaction Control
+    //                                                                 ===================
     public void commit() {
         try {
-            _transactionManager.commit(_transactionStatus);
+            for (OneTransactionElement element : _transactionManagerList) {
+                final PlatformTransactionManager manager = element.getTransactionManager();
+                final TransactionStatus status = element.getTransactionStatus();
+                manager.commit(status);
+            }
         } catch (RuntimeException e) {
             throw new TransactionFailureException("Failed to commit the transaction.", e);
         }
@@ -39,25 +72,23 @@ public class SpringTransactionResource implements TransactionResource {
 
     public void rollback() {
         try {
-            _transactionManager.rollback(_transactionStatus);
+            for (OneTransactionElement element : _transactionManagerList) {
+                final PlatformTransactionManager manager = element.getTransactionManager();
+                final TransactionStatus status = element.getTransactionStatus();
+                manager.rollback(status);
+            }
         } catch (RuntimeException e) {
             throw new TransactionFailureException("Failed to roll-back the transaction.", e);
         }
     }
 
-    public PlatformTransactionManager getTransactionManager() {
-        return _transactionManager;
-    }
-
-    public void setTransactionManager(PlatformTransactionManager transactionManager) {
-        this._transactionManager = transactionManager;
-    }
-
-    public TransactionStatus getTransactionStatus() {
-        return _transactionStatus;
-    }
-
-    public void setTransactionStatus(TransactionStatus transactionStatus) {
-        this._transactionStatus = transactionStatus;
+    // ===================================================================================
+    //                                                            Transaction Registration
+    //                                                            ========================
+    public void registerTransaction(PlatformTransactionManager transactionManager, TransactionStatus transactionStatus) {
+        OneTransactionElement element = new OneTransactionElement();
+        element.setTransactionManager(transactionManager);
+        element.setTransactionStatus(transactionStatus);
+        _transactionManagerList.add(element);
     }
 }
