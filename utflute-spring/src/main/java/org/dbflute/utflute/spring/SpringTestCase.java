@@ -140,14 +140,16 @@ public abstract class SpringTestCase extends InjectionTestCase {
     @Override
     protected TransactionResource beginNewTransaction() { // user method
         final String defaultManagerName = "transactionManager";
-        final String[] managerNames = prepareAdditionalTransactionManagerNames();
         final List<String> managerNameList = newArrayList();
-        managerNameList.add(defaultManagerName);
-        for (String name : managerNames) {
-            managerNameList.add(name);
+        {
+            managerNameList.add(defaultManagerName);
+            final String[] additionals = prepareAdditionalTransactionManagerNames();
+            for (String name : additionals) {
+                managerNameList.add(name);
+            }
         }
         SpringTransactionResource resource = null;
-        for (String name : managerNames) {
+        for (String name : managerNameList) {
             if (!hasComponent(name)) {
                 if (name.equals(defaultManagerName)) { // default transaction
                     continue;

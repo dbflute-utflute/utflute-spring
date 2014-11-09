@@ -59,24 +59,28 @@ public class SpringTransactionResource implements TransactionResource {
     //                                                                 Transaction Control
     //                                                                 ===================
     public void commit() {
+        if (_transactionManagerList.isEmpty()) {
+            return;
+        }
+        final OneTransactionElement mainTx = _transactionManagerList.get(0); // because of TransactionSynchronization
         try {
-            for (OneTransactionElement element : _transactionManagerList) {
-                final PlatformTransactionManager manager = element.getTransactionManager();
-                final TransactionStatus status = element.getTransactionStatus();
-                manager.commit(status);
-            }
+            final PlatformTransactionManager manager = mainTx.getTransactionManager();
+            final TransactionStatus status = mainTx.getTransactionStatus();
+            manager.commit(status);
         } catch (RuntimeException e) {
             throw new TransactionFailureException("Failed to commit the transaction.", e);
         }
     }
 
     public void rollback() {
+        if (_transactionManagerList.isEmpty()) {
+            return;
+        }
+        final OneTransactionElement mainTx = _transactionManagerList.get(0); // because of TransactionSynchronization
         try {
-            for (OneTransactionElement element : _transactionManagerList) {
-                final PlatformTransactionManager manager = element.getTransactionManager();
-                final TransactionStatus status = element.getTransactionStatus();
-                manager.rollback(status);
-            }
+            final PlatformTransactionManager manager = mainTx.getTransactionManager();
+            final TransactionStatus status = mainTx.getTransactionStatus();
+            manager.rollback(status);
         } catch (RuntimeException e) {
             throw new TransactionFailureException("Failed to roll-back the transaction.", e);
         }
@@ -86,7 +90,7 @@ public class SpringTransactionResource implements TransactionResource {
     //                                                            Transaction Registration
     //                                                            ========================
     public void registerTransaction(PlatformTransactionManager transactionManager, TransactionStatus transactionStatus) {
-        OneTransactionElement element = new OneTransactionElement();
+        final OneTransactionElement element = new OneTransactionElement();
         element.setTransactionManager(transactionManager);
         element.setTransactionStatus(transactionStatus);
         _transactionManagerList.add(element);
