@@ -18,6 +18,7 @@ package org.dbflute.utflute.spring;
 import java.sql.Connection;
 import java.sql.SQLException;
 
+import javax.annotation.Resource;
 import javax.sql.DataSource;
 
 import org.dbflute.jdbc.DataSourceHandler;
@@ -34,8 +35,9 @@ public abstract class ContainerTestCase extends SpringTestCase {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    /** The data source for database. (NotNull: after injection) */
-    protected DataSource _xdataSource;
+    /** The (main) data source for database. (NotNull: after injection) */
+    @Resource(name = "dataSource")
+    protected DataSource _xdataSource; // resolved by name for multiple DB
 
     // ===================================================================================
     //                                                                         JDBC Helper
