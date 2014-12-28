@@ -16,6 +16,8 @@
 package org.dbflute.utflute.spring.web.bean;
 
 import org.dbflute.utflute.spring.web.WebContainerTestCase;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.request.RequestContextHolder;
 
 /**
  * @author jflute
@@ -23,8 +25,27 @@ import org.dbflute.utflute.spring.web.WebContainerTestCase;
  */
 public class BarActionTest extends WebContainerTestCase {
 
+    // ===================================================================================
+    //                                                                            Settings
+    //                                                                            ========
+    @Override
+    public void setUp() throws Exception {
+        assertNull(RequestContextHolder.getRequestAttributes());
+        super.setUp();
+    }
+
+    @Override
+    public void tearDown() throws Exception {
+        super.tearDown();
+        assertNull(RequestContextHolder.getRequestAttributes());
+    }
+
+    // ===================================================================================
+    //                                                                      Inject Request
+    //                                                                      ==============
     public void test_inject_request() throws Exception {
         // ## Arrange ##
+        assertUTFluteSpringWebSystem();
         BarAction action = new BarAction();
 
         // ## Act ##
@@ -40,5 +61,11 @@ public class BarActionTest extends WebContainerTestCase {
         assertNull(action.barLogic.request);
         assertNotNull(action.transactionManager);
         assertNotNull(action.request);
+        assertUTFluteSpringWebSystem();
+    }
+
+    protected void assertUTFluteSpringWebSystem() {
+        assertNotNull(RequestContextHolder.getRequestAttributes());
+        assertTrue(getApplicationContext() instanceof WebApplicationContext);
     }
 }

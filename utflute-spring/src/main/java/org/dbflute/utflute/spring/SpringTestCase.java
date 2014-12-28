@@ -282,4 +282,11 @@ public abstract class SpringTestCase extends InjectionTestCase {
             return false;
         }
     }
+
+    // -----------------------------------------------------
+    //                                   Application Context
+    //                                   -------------------
+    protected ApplicationContext getApplicationContext() {
+        return _xcurrentActiveContext;
+    }
 }
