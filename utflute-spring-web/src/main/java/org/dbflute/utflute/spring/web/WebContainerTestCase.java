@@ -19,8 +19,10 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletRequestEvent;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.dbflute.utflute.core.binding.ComponentBinder;
 import org.dbflute.utflute.mocklet.MockletHttpServletRequest;
 import org.dbflute.utflute.mocklet.MockletHttpServletRequestImpl;
 import org.dbflute.utflute.mocklet.MockletHttpServletResponse;
@@ -159,6 +161,26 @@ public abstract class WebContainerTestCase extends ContainerTestCase {
     protected void xdoClearWebMockContext() {
         _xmockRequest = null;
         _xmockResponse = null;
+    }
+
+    // ===================================================================================
+    //                                                                   Component Binding
+    //                                                                   =================
+    @Override
+    protected void xadjustOuterComponentBinder(Object bean, ComponentBinder binder) {
+        super.xadjustOuterComponentBinder(bean, binder);
+        final MockletHttpServletRequest request = getMockRequest();
+        if (request != null) {
+            binder.addNestedBindingComponent(HttpServletRequest.class, request);
+        }
+        final MockletHttpSession session = getMockSession();
+        if (session != null) {
+            binder.addNestedBindingComponent(HttpSession.class, session);
+        }
+        final MockletHttpServletResponse response = getMockResponse();
+        if (response != null) {
+            binder.addNestedBindingComponent(HttpServletResponse.class, response);
+        }
     }
 
     // ===================================================================================
