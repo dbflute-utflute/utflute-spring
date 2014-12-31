@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2014 the original author or authors.
+ * Copyright 2014-2015 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,11 @@
  */
 package org.dbflute.utflute.spring.web.bean;
 
+import javax.annotation.Resource;
+
 import org.dbflute.utflute.spring.web.WebContainerTestCase;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.request.RequestContextHolder;
 
 /**
  * @author jflute
@@ -23,9 +27,51 @@ import org.dbflute.utflute.spring.web.WebContainerTestCase;
  */
 public class BarActionTest extends WebContainerTestCase {
 
+    protected static BarAction cachedInjectingBarAction;
+    protected static BarLogic cachedNestedBarLogic;
+
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    @Resource
+    protected BarLogic barLogic;
+
+    // ===================================================================================
+    //                                                                            Settings
+    //                                                                            ========
+    @Override
+    public void setUp() throws Exception {
+        assertNull(barLogic);
+        assertNull(cachedInjectingBarAction);
+        assertNull(cachedNestedBarLogic);
+        assertNull(RequestContextHolder.getRequestAttributes());
+        super.setUp();
+        assertNotNull(barLogic);
+    }
+
+    @Override
+    public void tearDown() throws Exception {
+        assertNotNull(barLogic);
+        assertNotNull(cachedInjectingBarAction.barLogic);
+        assertNotNull(cachedNestedBarLogic.request);
+        super.tearDown();
+        assertNull(RequestContextHolder.getRequestAttributes());
+        assertNull(cachedInjectingBarAction.barLogic);
+        assertNull(cachedNestedBarLogic.request);
+        assertNull(cachedInjectingBarAction.barLogic);
+        assertNull(barLogic);
+        cachedInjectingBarAction = null;
+        cachedNestedBarLogic = null;
+    }
+
+    // ===================================================================================
+    //                                                                      Inject Request
+    //                                                                      ==============
     public void test_inject_request() throws Exception {
         // ## Arrange ##
+        assertUTFluteSpringWebSystem();
         BarAction action = new BarAction();
+        cachedInjectingBarAction = action;
 
         // ## Act ##
         inject(action);
@@ -37,8 +83,16 @@ public class BarActionTest extends WebContainerTestCase {
         log(action.request);
         assertNotNull(action.barBhv);
         assertNotNull(action.barLogic);
-        assertNull(action.barLogic.request);
+        cachedNestedBarLogic = action.barLogic;
+        assertNotNull(action.barLogic.request); // injected as special nested binding
         assertNotNull(action.transactionManager);
         assertNotNull(action.request);
+        assertUTFluteSpringWebSystem();
+    }
+
+    protected void assertUTFluteSpringWebSystem() {
+        assertNotNull(RequestContextHolder.getRequestAttributes());
+        assertTrue(getApplicationContext() instanceof WebApplicationContext);
+        assertNotNull(barLogic);
     }
 }

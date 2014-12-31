@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2014 the original author or authors.
+ * Copyright 2014-2015 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,10 +16,13 @@
 package org.dbflute.utflute.spring.web;
 
 import javax.servlet.ServletContext;
+import javax.servlet.ServletRequestEvent;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.dbflute.utflute.core.binding.ComponentBinder;
 import org.dbflute.utflute.mocklet.MockletHttpServletRequest;
 import org.dbflute.utflute.mocklet.MockletHttpServletRequestImpl;
 import org.dbflute.utflute.mocklet.MockletHttpServletResponse;
@@ -30,6 +33,9 @@ import org.dbflute.utflute.mocklet.MockletServletConfigImpl;
 import org.dbflute.utflute.mocklet.MockletServletContext;
 import org.dbflute.utflute.mocklet.MockletServletContextImpl;
 import org.dbflute.utflute.spring.ContainerTestCase;
+import org.dbflute.utflute.spring.web.mock.MockWebApplicationContextAdapter;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.request.RequestContextListener;
 
 /**
  * @author jflute
@@ -55,6 +61,9 @@ public abstract class WebContainerTestCase extends ContainerTestCase {
     /** The mock response of the test case execution. (NullAllowed: when no web mock or beginning or ending) */
     protected MockletHttpServletResponse _xmockResponse;
 
+    /** The mock listener of the test case request. (NullAllowed: when no web mock or beginning or ending) */
+    protected RequestContextListener _xmockListener;
+
     // ===================================================================================
     //                                                                            Settings
     //                                                                            ========
@@ -65,16 +74,31 @@ public abstract class WebContainerTestCase extends ContainerTestCase {
     protected void xprepareTestCaseContainer() {
         super.xprepareTestCaseContainer();
         xdoPrepareWebMockContext();
+        xdoListenRequestInitialized();
+        xdoAdaptApplicationContextToWeb();
+    }
+
+    @Override
+    protected boolean xconfigCanAcceptContainerRecycle(String[] configFiles) {
+        final boolean superResult = super.xconfigCanAcceptContainerRecycle(configFiles);
+        if (superResult) {
+            return true;
+        }
+        return _xcachedContext != null && _xcachedContext instanceof WebApplicationContext;
     }
 
     @Override
     protected boolean xcanRecycleContainer(String[] configFiles) {
-        return super.xcanRecycleContainer(configFiles) && xwebMockCanAcceptContainerRecycle();
+        final boolean superResult = super.xcanRecycleContainer(configFiles);
+        return superResult && xisCachedApplicationContextWeb() && xwebMockCanAcceptContainerRecycle();
+    }
+
+    protected boolean xisCachedApplicationContextWeb() {
+        return _xcachedContext != null && _xcachedContext instanceof WebApplicationContext;
     }
 
     protected boolean xwebMockCanAcceptContainerRecycle() {
-        // no mark or no change
-        return _xcachedSuppressWebMock == null || _xcachedSuppressWebMock.equals(isSuppressWebMock());
+        return _xcachedSuppressWebMock == null || _xcachedSuppressWebMock.equals(isSuppressWebMock()); // no mark or no change
     }
 
     @Override
@@ -100,11 +124,63 @@ public abstract class WebContainerTestCase extends ContainerTestCase {
         xregisterWebMockContext(servletConfig);
     }
 
+    protected void xdoListenRequestInitialized() {
+        final MockletHttpServletRequest request = getMockRequest();
+        if (request != null) {
+            ServletRequestEvent event = new ServletRequestEvent(request.getServletContext(), request);
+            _xmockListener = new RequestContextListener();
+            _xmockListener.requestInitialized(event);
+        }
+    }
+
+    protected void xdoAdaptApplicationContextToWeb() {
+        final MockletHttpServletRequest request = getMockRequest();
+        if (request != null) {
+            _xcurrentActiveContext = new MockWebApplicationContextAdapter(getApplicationContext(), request.getServletContext());
+        }
+    }
+
     @Override
     public void tearDown() throws Exception {
+        xdoListenRequestDestroyed();
+        xdoClearWebMockContext();
+        super.tearDown();
+    }
+
+    protected void xdoListenRequestDestroyed() {
+        if (_xmockListener != null) {
+            final MockletHttpServletRequest request = getMockRequest();
+            if (request != null) { // just in case
+                ServletRequestEvent event = new ServletRequestEvent(request.getServletContext(), request);
+                _xmockListener.requestDestroyed(event);
+                _xmockListener = null;
+            }
+        }
+    }
+
+    protected void xdoClearWebMockContext() {
         _xmockRequest = null;
         _xmockResponse = null;
-        super.tearDown();
+    }
+
+    // ===================================================================================
+    //                                                                   Component Binding
+    //                                                                   =================
+    @Override
+    protected void xadjustOuterComponentBinder(Object bean, ComponentBinder binder) {
+        super.xadjustOuterComponentBinder(bean, binder);
+        final MockletHttpServletRequest request = getMockRequest();
+        if (request != null) {
+            binder.addNestedBindingComponent(HttpServletRequest.class, request);
+        }
+        final MockletHttpSession session = getMockSession();
+        if (session != null) {
+            binder.addNestedBindingComponent(HttpSession.class, session);
+        }
+        final MockletHttpServletResponse response = getMockResponse();
+        if (response != null) {
+            binder.addNestedBindingComponent(HttpServletResponse.class, response);
+        }
     }
 
     // ===================================================================================
