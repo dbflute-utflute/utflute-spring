@@ -37,7 +37,7 @@ public abstract class ContainerTestCase extends SpringTestCase {
     //                                                                           =========
     /** The (main) data source for database. (NotNull: after injection) */
     @Resource(name = "dataSource")
-    protected DataSource _xdataSource; // resolved by name for multiple DB
+    private DataSource _xdataSource; // resolved by name for multiple DB
 
     // ===================================================================================
     //                                                                         JDBC Helper
@@ -60,7 +60,14 @@ public abstract class ContainerTestCase extends SpringTestCase {
      */
     protected DataSource wrapSpringTransactionalDataSource(DataSource dataSource) {
         // same way as DBFlute does because it may use, e.g. Commons DBCP
-        final SpringTransactionalDataSourceHandler handler = new SpringTransactionalDataSourceHandler();
+        return xcreateHandlingDataSourceWrapper(xcreateSpringTransactionalDataSourceHandler());
+    }
+
+    protected SpringTransactionalDataSourceHandler xcreateSpringTransactionalDataSourceHandler() {
+        return new SpringTransactionalDataSourceHandler();
+    }
+
+    protected HandlingDataSourceWrapper xcreateHandlingDataSourceWrapper(SpringTransactionalDataSourceHandler handler) {
         return new HandlingDataSourceWrapper(_xdataSource, new DataSourceHandler() {
             public Connection getConnection(DataSource dataSource) throws SQLException {
                 return handler.getConnection(dataSource);

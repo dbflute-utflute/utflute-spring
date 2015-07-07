@@ -34,6 +34,7 @@ import org.dbflute.utflute.mocklet.MockletServletContext;
 import org.dbflute.utflute.mocklet.MockletServletContextImpl;
 import org.dbflute.utflute.spring.ContainerTestCase;
 import org.dbflute.utflute.spring.web.mock.MockWebApplicationContextAdapter;
+import org.springframework.context.ApplicationContext;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.request.RequestContextListener;
 
@@ -50,19 +51,19 @@ public abstract class WebContainerTestCase extends ContainerTestCase {
     //                                         Static Cached
     //                                         -------------
     /** The cached determination of suppressing web mock. (NullAllowed: null means beginning or ending) */
-    protected static Boolean _xcachedSuppressWebMock;
+    private static Boolean _xcachedSuppressWebMock;
 
     // -----------------------------------------------------
     //                                              Web Mock
     //                                              --------
     /** The mock request of the test case execution. (NullAllowed: when no web mock or beginning or ending) */
-    protected MockletHttpServletRequest _xmockRequest;
+    private MockletHttpServletRequest _xmockRequest;
 
     /** The mock response of the test case execution. (NullAllowed: when no web mock or beginning or ending) */
-    protected MockletHttpServletResponse _xmockResponse;
+    private MockletHttpServletResponse _xmockResponse;
 
     /** The mock listener of the test case request. (NullAllowed: when no web mock or beginning or ending) */
-    protected RequestContextListener _xmockListener;
+    private RequestContextListener _xmockListener;
 
     // ===================================================================================
     //                                                                            Settings
@@ -84,7 +85,7 @@ public abstract class WebContainerTestCase extends ContainerTestCase {
         if (superResult) {
             return true;
         }
-        return _xcachedContext != null && _xcachedContext instanceof WebApplicationContext;
+        return xgetCachedContext() != null && xgetCachedContext() instanceof WebApplicationContext;
     }
 
     @Override
@@ -94,7 +95,7 @@ public abstract class WebContainerTestCase extends ContainerTestCase {
     }
 
     protected boolean xisCachedApplicationContextWeb() {
-        return _xcachedContext != null && _xcachedContext instanceof WebApplicationContext;
+        return xgetCachedContext() != null && xgetCachedContext() instanceof WebApplicationContext;
     }
 
     protected boolean xwebMockCanAcceptContainerRecycle() {
@@ -136,7 +137,9 @@ public abstract class WebContainerTestCase extends ContainerTestCase {
     protected void xdoAdaptApplicationContextToWeb() {
         final MockletHttpServletRequest request = getMockRequest();
         if (request != null) {
-            _xcurrentActiveContext = new MockWebApplicationContextAdapter(getApplicationContext(), request.getServletContext());
+            final ApplicationContext appContext = getApplicationContext();
+            final ServletContext servletContext = request.getServletContext();
+            xsetCurrentActiveContext(new MockWebApplicationContextAdapter(appContext, servletContext));
         }
     }
 
@@ -321,5 +324,40 @@ public abstract class WebContainerTestCase extends ContainerTestCase {
         if (session != null) {
             session.setAttribute(name, value);
         }
+    }
+
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
+    protected static Boolean xgetCachedSuppressWebMock() {
+        return _xcachedSuppressWebMock;
+    }
+
+    protected static void xsetCachedSuppressWebMock(Boolean xcachedSuppressWebMock) {
+        _xcachedSuppressWebMock = xcachedSuppressWebMock;
+    }
+
+    protected MockletHttpServletRequest xgetMockRequest() {
+        return _xmockRequest;
+    }
+
+    protected void xsetMockRequest(MockletHttpServletRequest xmockRequest) {
+        _xmockRequest = xmockRequest;
+    }
+
+    protected MockletHttpServletResponse xgetMockResponse() {
+        return _xmockResponse;
+    }
+
+    protected void xsetMockResponse(MockletHttpServletResponse xmockResponse) {
+        _xmockResponse = xmockResponse;
+    }
+
+    protected RequestContextListener xgetMockListener() {
+        return _xmockListener;
+    }
+
+    protected void xsetMockListener(RequestContextListener xmockListener) {
+        _xmockListener = xmockListener;
     }
 }

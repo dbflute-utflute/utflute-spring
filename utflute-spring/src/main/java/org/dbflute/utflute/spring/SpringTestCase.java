@@ -52,16 +52,16 @@ public abstract class SpringTestCase extends InjectionTestCase {
     //                                          Static Cache
     //                                          ------------
     /** The cached configuration files of DI container. (NullAllowed: null means beginning or ending) */
-    protected static String[] _xcachedConfigFiles;
+    private static String[] _xcachedConfigFiles;
 
     /** The cached application context for DI container. (NullAllowed: null means beginning or ending) */
-    protected static ApplicationContext _xcachedContext;
+    private static ApplicationContext _xcachedContext;
 
     // -----------------------------------------------------
     //                                         Spring Object
     //                                         -------------
     /** The current active context of application. {Spring Object} */
-    protected ApplicationContext _xcurrentActiveContext;
+    private ApplicationContext _xcurrentActiveContext;
 
     // ===================================================================================
     //                                                                            Settings
@@ -288,5 +288,32 @@ public abstract class SpringTestCase extends InjectionTestCase {
     //                                   -------------------
     protected ApplicationContext getApplicationContext() {
         return _xcurrentActiveContext;
+    }
+
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
+    protected static String[] xgetCachedConfigFiles() {
+        return _xcachedConfigFiles;
+    }
+
+    protected static void xsetCachedConfigFiles(String[] xcachedConfigFiles) {
+        _xcachedConfigFiles = xcachedConfigFiles;
+    }
+
+    protected static ApplicationContext xgetCachedContext() {
+        return _xcachedContext;
+    }
+
+    protected static void xsetCachedContext(ApplicationContext xcachedContext) {
+        _xcachedContext = xcachedContext;
+    }
+
+    protected ApplicationContext xgetCurrentActiveContext() {
+        return _xcurrentActiveContext;
+    }
+
+    protected void xsetCurrentActiveContext(ApplicationContext xcurrentActiveContext) {
+        _xcurrentActiveContext = xcurrentActiveContext;
     }
 }
