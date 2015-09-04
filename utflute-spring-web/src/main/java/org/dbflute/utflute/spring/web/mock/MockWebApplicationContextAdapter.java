@@ -15,6 +15,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.MessageSourceResolvable;
 import org.springframework.context.NoSuchMessageException;
+import org.springframework.core.ResolvableType;
 import org.springframework.core.env.Environment;
 import org.springframework.core.io.Resource;
 import org.springframework.web.context.WebApplicationContext;
@@ -187,6 +188,18 @@ public class MockWebApplicationContextAdapter implements WebApplicationContext {
 
     public String[] getAliases(String name) {
         return _applicationContext.getAliases(name);
+    }
+
+    public String[] getBeanNamesForType(ResolvableType type) {
+        return _applicationContext.getBeanNamesForType(type);
+    }
+
+    public boolean isTypeMatch(String name, ResolvableType typeToMatch) throws NoSuchBeanDefinitionException {
+        return _applicationContext.isTypeMatch(name, typeToMatch);
+    }
+
+    public void publishEvent(Object event) {
+        _applicationContext.publishEvent(event);
     }
 
     // ===================================================================================
