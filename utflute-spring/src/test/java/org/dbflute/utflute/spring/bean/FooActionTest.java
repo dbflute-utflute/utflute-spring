@@ -123,7 +123,7 @@ public class FooActionTest extends ContainerTestCase {
         assertNotNull(action.barController);
         assertNull(action.barController.facadeInstance());
         assertNotNull(action.fooLogic);
-        assertNull(action.fooLogic.behaviorToString());
+        assertNotNull(action.fooLogic.behaviorToString());
         assertNull(action.fooLogic.fooHelper);
         assertNull(action.fooLogic.fooService);
         assertNull(action.fooLogic.getTransactionManager());
