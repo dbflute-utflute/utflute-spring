@@ -10,7 +10,7 @@
 	<artifactId>utflute-spring-web</artifactId>
 	<packaging>jar</packaging>
 
-	<name>UTFlute Spring</name>
+	<name>UTFlute Spring Web</name>
 	<description>The unit test library for Spring Framework (with DBFlute) and Web</description>
 
 	<properties>
