@@ -23,6 +23,11 @@ public class FooFacade extends FooBaseFacade {
         return fooBhv;
     }
 
+    @Override
+    public String toString() {
+        return "facade:{" + fooBhv + ", " + transactionManager + ", " + fooService + "}@" + Integer.toHexString(hashCode());
+    }
+
     public FooService getFooService() {
         return fooService;
     }
