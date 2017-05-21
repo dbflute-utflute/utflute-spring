@@ -5,12 +5,12 @@
 	<parent>
 		<groupId>org.dbflute.utflute</groupId>
 		<artifactId>utflute-base</artifactId>
-		<version>0.7.5</version>
+		<version>0.7.7</version>
 	</parent>
 	<artifactId>utflute-spring-web</artifactId>
 	<packaging>jar</packaging>
 
-	<name>UTFlute Spring</name>
+	<name>UTFlute Spring Web</name>
 	<description>The unit test library for Spring Framework (with DBFlute) and Web</description>
 
 	<properties>

@@ -54,12 +54,14 @@ public class BarActionTest extends WebContainerTestCase {
         assertNotNull(barLogic);
         assertNotNull(cachedInjectingBarAction.barLogic);
         assertNotNull(cachedNestedBarLogic.request);
+        BarLogic managedLogic = barLogic; // keep to check
         super.tearDown();
         assertNull(RequestContextHolder.getRequestAttributes());
         assertNull(cachedInjectingBarAction.barLogic);
-        assertNull(cachedNestedBarLogic.request);
+        assertNotNull(cachedNestedBarLogic.request); // because of container-managed
         assertNull(cachedInjectingBarAction.barLogic);
         assertNull(barLogic);
+        assertNotNull(managedLogic.request);
         cachedInjectingBarAction = null;
         cachedNestedBarLogic = null;
     }

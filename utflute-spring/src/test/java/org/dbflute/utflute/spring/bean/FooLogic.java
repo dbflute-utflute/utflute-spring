@@ -29,6 +29,11 @@ public class FooLogic {
         return fooBhv != null ? fooBhv.toString() : null;
     }
 
+    @Override
+    public String toString() {
+        return "facade:{" + fooBhv + ", " + fooHelper + ", " + fooService + "}@" + Integer.toHexString(hashCode());
+    }
+
     public PlatformTransactionManager getTransactionManager() {
         return fooBhv != null ? fooBhv.getTransactionManager() : null;
     }

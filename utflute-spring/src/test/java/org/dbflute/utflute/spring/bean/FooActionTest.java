@@ -23,6 +23,46 @@ import org.dbflute.utflute.spring.dbflute.exbhv.FooBhv;
  */
 public class FooActionTest extends ContainerTestCase {
 
+    public void test_inject_all_for_next_testcase() throws Exception {
+        // ## Arrange ##
+        FooAction action = new FooAction();
+        FooBhv bhv = new FooBhv();
+        FooController controller = new FooControllerImpl();
+        FooLogic logic = new FooLogic();
+        inject(bhv);
+        inject(controller);
+        inject(logic);
+        registerMockInstance(bhv);
+        registerMockInstance(controller);
+        registerMockInstance(logic);
+
+        // ## Act ##
+        inject(action);
+
+        // ## Assert ##
+        log(action.fooBhv);
+        log(action.fooController);
+        log(action.fooHelper);
+        log(action.fooLogic);
+        log(action.facadeInstance());
+        log(action.serviceToString());
+        log(action.transactionManager);
+
+        assertNotNull(action.fooBhv);
+        assertNotNull(action.fooBhv.getTransactionManager());
+        assertNull(action.fooController);
+        assertNotNull(action.barController);
+        assertNotNull(action.barController.facadeInstance());
+        assertNotNull(action.fooLogic);
+        assertNotNull(action.fooLogic.behaviorToString());
+        assertNotNull(action.fooLogic.fooHelper);
+        assertNotNull(action.fooLogic.fooService);
+        assertNotNull(action.fooLogic.getTransactionManager());
+        assertNotNull(action.transactionManager);
+        assertSame(bhv, action.fooBhv);
+        assertSame(logic, action.fooLogic);
+    }
+
     public void test_inject_basic() throws Exception {
         // ## Arrange ##
         FooAction action = new FooAction();
@@ -35,6 +75,7 @@ public class FooActionTest extends ContainerTestCase {
         log(action.fooController);
         log(action.fooHelper);
         log(action.fooLogic);
+        log(action.facadeInstance());
         log(action.serviceToString());
         log(action.transactionManager);
         // no web here
