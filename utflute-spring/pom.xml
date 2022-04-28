@@ -14,7 +14,7 @@
 	<description>The unit test library for Spring Framework (with DBFlute)</description>
 
 	<properties>
-		<spring.version>4.3.20.RELEASE</spring.version>
+		<spring.version>4.3.30.RELEASE</spring.version>
 	</properties>
 
 	<dependencies>
